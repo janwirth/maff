@@ -2,6 +2,7 @@
 Image processing - forked from
 http://blog.mathocr.com/2017/06/25/image-processing-for-text-recognition.html
 """
+
 from skimage import img_as_ubyte, io
 from skimage.io import imread
 from skimage.filters import gaussian, threshold_minimum
@@ -9,9 +10,6 @@ from skimage.morphology import square, erosion, thin
 
 import numpy as np
 import cv2
-
-IMG_PATH = '/Users/wirthjan/maff/formula.jpg'
-
 
 def binarize(image_abs_path):
 
@@ -80,9 +78,7 @@ def extract_contours(image_abs_path):
     patterns = []
     return contours
 
-contours = extract_contours(IMG_PATH)
-flat_contours = [[list(point[0]) for point in stroke] for stroke in contours]
-# print(contours[0])
-# toVisualize = np.asarray(flat_contours).squeeze()
-# print([list(e) for e in toVisualize])
-print(flat_contours)
+def get_contours(img_path):
+  contours = extract_contours(img_path)
+  flat_contours = [[list(point[0]) for point in stroke] for stroke in contours]
+  return flat_contours

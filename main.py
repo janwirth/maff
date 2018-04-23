@@ -1,29 +1,20 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import logging
-import pprint
-print('hi')
+from urllib import request, parse
+import urllib
+from recognizer import get_contours
+ 
+IMG_PATH = '/Users/wirthjan/maff/formula.jpg'
+ENDPOINT = "http://cat.prhlt.upv.es/mer/eq.php"
 
-def start_bot ():
+def recognize(contours):
 
-  TOKEN = '551273072:AAGlazl70vLRRyaCPbEiCF_2a0Mf0fzdejM'
+  print('making request...')
+  data = str(contours)
+  payload = "strokes=" + parse.quote(data.encode("utf-8"))
 
-  updater = Updater(token=TOKEN)
+  full_url = ENDPOINT
+  response = request.urlopen(full_url, parse.unquote_to_bytes(payload))
+  return str(response.read()).strip()
 
-  logging.basicConfig(format='%(asctime)s - %(name)s', level=logging.INFO)
-
-  def start(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="I'm a bot, please be nice")
-  start_handler = CommandHandler('start', start)
-
-  def process_image(bot, update):
-    photo = update.message.photo[3]
-    print(photo)
-    newFile = bot.get_file(photo.file_id)
-    newFile.download('formula.jpg')
-    bot.send_message(chat_id=update.message.chat_id, text='got image')
-
-  image_handler = MessageHandler(Filters.photo, process_image)
-
-  updater.dispatcher.add_handler(start_handler)
-  updater.dispatcher.add_handler(image_handler)
-  updater.start_polling()
+print('getting contours...')
+contours = get_contours(IMG_PATH)
+print(recognize(contours))
