@@ -50,7 +50,7 @@ def get_scale(cont_width, cont_height, box_size):
     else:
         return box_size / cont_width
 
-def extract_patterns(image_abs_path):
+def extract_contours(image_abs_path):
 
     max_intensity = 1
     # Here we define the size of the square box that will contain a single pattern
@@ -78,51 +78,11 @@ def extract_patterns(image_abs_path):
 
     # Initialize patterns array
     patterns = []
+    return contours
 
-    for contour in contours:
-
-
-        # Initialize blank white box that will contain a single pattern
-        pattern = np.ones(shape=(box_size, box_size), dtype=np.uint8) * 255
-
-        # Shift contour coordinates so that they are now relative to its square image
-        shifted_cont = shift(contour)
-
-        # Get size of the contour
-        cont_width, cont_height = cv2.boundingRect(contour)[2:]
-        # boundingRect method returns width and height values that are too big by 1 pixel
-        cont_width -= 1
-        cont_height -= 1
-
-        # Get scale - we will use this scale to interpolate contour so that it fits into
-        # box_size X box_size square box.
-        scale = get_scale(cont_width, cont_height, box_size)
-
-        # Interpolate contour and round coordinate values to int type
-        rescaled_cont = np.floor(shifted_cont * scale).astype(dtype=np.int32)
-
-        # Get size of the rescaled contour
-        rescaled_cont_width, rescaled_cont_height = cont_width * scale, cont_height * scale
-
-        # Get margin
-        margin_x = int((box_size - rescaled_cont_width) / 2)
-        margin_y = int((box_size - rescaled_cont_height) / 2)
-
-        # Center pattern wihin a square box - we move pattern right by a proper margin
-        centered_cont = np.add(rescaled_cont, [margin_x, margin_y])
-
-        # Draw centered contour on a blank square box
-        cv2.drawContours(pattern, [centered_cont], contourIdx=0, color=(0))
-
-        patterns.append(pattern)
-
-    return patterns
-
-patterns = extract_patterns(IMG_PATH)
-print(patterns)
-io.imshow(patterns[1])
-#for p in patterns:
-#  io.imshow(p)
-
-io.show()
-# print(binarize(IMG_PATH))
+contours = extract_contours(IMG_PATH)
+flat_contours = [[list(point[0]) for point in stroke] for stroke in contours]
+# print(contours[0])
+# toVisualize = np.asarray(flat_contours).squeeze()
+# print([list(e) for e in toVisualize])
+print(flat_contours)
